@@ -38,6 +38,14 @@ chrome.browserAction.onClicked.addListener((tab) => {
   inject(tab)
 })
 
+chrome.commands.onCommand.addListener((command) => {
+  if (command === 'take-screenshot') {
+    chrome.tabs.getSelected(null, (tab) => {
+      inject(tab)
+    })
+  }
+})
+
 // Add a listener for capturing an image once the user completes area selection
 chrome.runtime.onMessage.addListener((req, sender, res) => {
   if (req.message === 'capture') {

@@ -24,6 +24,15 @@
     "/images/pixel.png"
   ],
 
+  "commands": {
+    "take-screenshot": {
+      "suggested_key": {
+        "default": "Alt+S"
+      },
+      "description": "Take Screenshot"
+    }
+  },
+
   "icons": {
     "16"  : "images/icon16.png",
     "48"  : "images/icon48.png",
@@ -32,6 +41,5 @@
 
   "permissions": [
     "activeTab"
-  ],
-  "Content-Security-Policy": "worker-src 'self' blob:;"
+  ]
 }
