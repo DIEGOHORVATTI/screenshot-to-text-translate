@@ -8,7 +8,7 @@
   "author": "Multiple (code integrated from multiple opensource projects",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jordansafer/screenshot-capture.git"
+    "url": "https://github.com/jordansafer/screenshot-to-text.git"
   },
   "dependencies": {},
   "bin": {},
