@@ -1,25 +1,4 @@
 
-// chrome.storage.sync.clear()
-
-chrome.storage.sync.get((config) => {
-  if (!config.method) {
-    chrome.storage.sync.set({method: 'crop'})
-  }
-  if (!config.format) {
-    chrome.storage.sync.set({format: 'png'})
-  }
-  if (!config.save) {
-    chrome.storage.sync.set({save: 'file'})
-  }
-  if (config.dpr === undefined) {
-    chrome.storage.sync.set({dpr: true})
-  }
-  // v1.9 -> v2.0
-  if (config.save === 'clipboard') {
-    config.save = 'url'
-    chrome.storage.sync.set({save: 'url'})
-  }
-})
 
 function inject (tab) {
   chrome.tabs.sendMessage(tab.id, {message: 'init'}, (res) => {
@@ -37,6 +16,7 @@ function inject (tab) {
     chrome.tabs.executeScript(tab.id, {file: 'content/content.js', runAt: 'document_start'})
 
     setTimeout(() => {
+      console.log("init")
       chrome.tabs.sendMessage(tab.id, {message: 'init'})
     }, 100)
   }, 100)
@@ -56,22 +36,21 @@ chrome.commands.onCommand.addListener((command) => {
 
 chrome.runtime.onMessage.addListener((req, sender, res) => {
   if (req.message === 'capture') {
-    chrome.storage.sync.get((config) => {
+    console.log("capture")
+    chrome.tabs.getSelected(null, (tab) => {
 
-      chrome.tabs.getSelected(null, (tab) => {
-
-        chrome.tabs.captureVisibleTab(tab.windowId, {format: "png"}, (image) => {
-          // image is base64
-          crop(image, req.area, req.dpr, "png", (cropped) => {
-            res({message: 'image', image: cropped})
-          })
+      chrome.tabs.captureVisibleTab(tab.windowId, {format: "png"}, (image) => {
+        // image is base64
+        crop(image, req.area, req.dpr, "png", (cropped) => {
+          res({message: 'image', image: cropped})
         })
       })
     })
   }
   else if (req.message === 'active') {
+    console.log("active")
     if (req.active) {
-      chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Crop and Save'})
+      chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Crop'})
       chrome.browserAction.setBadgeText({tabId: sender.tab.id, text: '◩'})
     }
     else {
@@ -83,10 +62,13 @@ chrome.runtime.onMessage.addListener((req, sender, res) => {
 })
 
 function crop (image, area, dpr, format, done) {
+  console.log("crop")
   var top = area.y * dpr
   var left = area.x * dpr
-  var w = area.w * dpr
+  var width = area.w * dpr
   var height = area.h * dpr
+  var w = width
+  var h = height
 
   var canvas = null
   if (!canvas) {

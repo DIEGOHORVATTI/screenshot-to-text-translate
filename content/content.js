@@ -33,6 +33,7 @@ var init = (done) => {
       }, 100)
     }
   }, function ready () {
+    console.log("jcroping")
     jcrop = this
 
     $('.jcrop-hline, .jcrop-vline').css({
@@ -51,6 +52,7 @@ var init = (done) => {
 }
 
 var capture = () => {
+  console.log("capturing")
   jcrop.release()
   setTimeout(() => {
     chrome.runtime.sendMessage({
@@ -64,6 +66,8 @@ var capture = () => {
 }
 
 var process = (image) => {
+  console.log(`Test: ${typeof(image)}, ${image.nodeName}`)
+  console.log(image)
   // TODO process and image that's been captured
 }
 
