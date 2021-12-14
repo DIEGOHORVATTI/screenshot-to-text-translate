@@ -22,8 +22,8 @@ Not working on: yahoo, facebook, linkedin, github, etc
 # Derived from
 
 - Screenshot Capture, by Simeon Velichkov
-    - [github]: https://github.com/simov/screenshot-capture
-    - [paypal]: https://www.paypal.me/simeonvelichkov
+  - github: <https://github.com/simov/screenshot-capture>
+  - paypal: <https://www.paypal.me/simeonvelichkov>
 - TesseractJS chrome extension, by Jerome Wu
-    - [github]: https://github.com/jeromewu/tesseract.js-chrome-extension
-    - [sponsor]: https://github.com/sponsors/jeromewu
+  - github: <https://github.com/jeromewu/tesseract.js-chrome-extension>
+  - sponsor: <https://github.com/sponsors/jeromewu>
