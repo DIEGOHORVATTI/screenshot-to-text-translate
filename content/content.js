@@ -8,6 +8,7 @@ var overlay = ((active) => (state) => {
 })(false)
 
 var image = (done) => {
+  console.log("make fake image")
   var image = new Image()
   image.id = 'fake-image'
   image.src = chrome.runtime.getURL('/images/pixel.png')
@@ -85,6 +86,7 @@ const doOCR = async (image) => {
   await worker.initialize('eng');
   const { data: { text } } = await worker.recognize(image);
   console.log(text);
+  alert(text);
   result.innerHTML = `<p>OCR Result:</p><p>${text}</p>`;
   await worker.terminate();
 }
@@ -100,12 +102,21 @@ window.addEventListener('resize', ((timeout) => () => {
 
 chrome.runtime.onMessage.addListener((req, sender, res) => {
   if (req.message === 'init') {
+    console.log("init")
     res({}) // prevent re-injecting
 
-    image(() => init(() => {
+    if (!jcrop) {
+      image(() => init(() => {
+        console.log("first capture")
+        overlay()
+        capture()
+      }))
+    }
+    else {
+      console.log("later capture")
       overlay()
       capture()
-    }))
+    }
   }
   return true
 })
