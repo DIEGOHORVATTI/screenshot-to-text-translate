@@ -60,48 +60,19 @@ chrome.runtime.onMessage.addListener((req, sender, res) => {
 
       chrome.tabs.getSelected(null, (tab) => {
 
-        chrome.tabs.captureVisibleTab(tab.windowId, {format: config.format}, (image) => {
+        chrome.tabs.captureVisibleTab(tab.windowId, {format: "png"}, (image) => {
           // image is base64
-
-          if (config.method === 'view') {
-            if (req.dpr !== 1 && !config.dpr) {
-              crop(image, req.area, req.dpr, config.dpr, config.format, (cropped) => {
-                res({message: 'image', image: cropped})
-              })
-            }
-            else {
-              res({message: 'image', image: image})
-            }
-          }
-          else {
-            crop(image, req.area, req.dpr, config.dpr, config.format, (cropped) => {
-              res({message: 'image', image: cropped})
-            })
-          }
+          crop(image, req.area, req.dpr, "png", (cropped) => {
+            res({message: 'image', image: cropped})
+          })
         })
       })
     })
   }
   else if (req.message === 'active') {
     if (req.active) {
-      chrome.storage.sync.get((config) => {
-        if (config.method === 'view') {
-          chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Capture Viewport'})
-          chrome.browserAction.setBadgeText({tabId: sender.tab.id, text: '⬒'})
-        }
-        // else if (config.method === 'full') {
-        //   chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Capture Document'})
-        //   chrome.browserAction.setBadgeText({tabId: sender.tab.id, text: '⬛'})
-        // }
-        else if (config.method === 'crop') {
-          chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Crop and Save'})
-          chrome.browserAction.setBadgeText({tabId: sender.tab.id, text: '◩'})
-        }
-        else if (config.method === 'wait') {
-          chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Crop and Wait'})
-          chrome.browserAction.setBadgeText({tabId: sender.tab.id, text: '◪'})
-        }
-      })
+      chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Crop and Save'})
+      chrome.browserAction.setBadgeText({tabId: sender.tab.id, text: '◩'})
     }
     else {
       chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Screenshot Capture'})
@@ -111,13 +82,11 @@ chrome.runtime.onMessage.addListener((req, sender, res) => {
   return true
 })
 
-function crop (image, area, dpr, preserve, format, done) {
+function crop (image, area, dpr, format, done) {
   var top = area.y * dpr
   var left = area.x * dpr
-  var width = area.w * dpr
+  var w = area.w * dpr
   var height = area.h * dpr
-  var w = (dpr !== 1 && preserve) ? width : area.w
-  var h = (dpr !== 1 && preserve) ? height : area.h
 
   var canvas = null
   if (!canvas) {
