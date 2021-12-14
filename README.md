@@ -14,7 +14,9 @@ Great for extracting text from images with clear text. We needed this for a webs
 Currently does not run on most sites, since the OCR is run on the primary worker, which is consumed/restricted in most large sites. Works on:
 - zingylearning.com (target site)
 - google.com, docs.google.com, cloud.google.com (and other google domains)
-- 
+- amazon.com, netflix.com
+- youtube.com, espn.com
+Not working on: yahoo, facebook, linkedin, github, etc
 
 
 # Derived from

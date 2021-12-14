@@ -1,9 +1,11 @@
+// Background processing, injects other content scripts for execution
 
-
+// Helper for injecting scripts
 function chromeInject(tab, filename, res){
   chrome.tabs.executeScript(tab.id, {file: filename, runAt: 'document_start'}, res)
 } 
 
+// Inject function/init function- sends a message for initialization and injects content scripts
 function inject (tab) {
   chrome.tabs.sendMessage(tab.id, {message: 'init'}, (res) => {
     if (res) {
@@ -18,14 +20,11 @@ function inject (tab) {
     chromeInject(tab, 'vendor/jquery.min.js')
     chromeInject(tab, 'vendor/jquery.Jcrop.min.js')
    
-    // OCR scripts
-   // chromeInject(tab, 'content/worker.min.js', () => {
+    // OCR script
     chromeInject(tab, 'content/tesseract.min.js', () => {
-   //     chromeInject(tab, 'content/tesseract-core.wasm.js', () => {
-          chromeInject(tab, 'content/content.js')
-   //     })
+      // Nesting content injection in tesseract injection to satisfy the dependency
+      chromeInject(tab, 'content/content.js')
     })
-  //  })
 
     setTimeout(() => {
       console.log("init")
@@ -34,21 +33,15 @@ function inject (tab) {
   }, 100)
 }
 
+// Initialize/run when the user clicks on the tab
 chrome.browserAction.onClicked.addListener((tab) => {
   inject(tab)
 })
 
-chrome.commands.onCommand.addListener((command) => {
-  if (command === 'take-screenshot') {
-    chrome.tabs.getSelected(null, (tab) => {
-      inject(tab)
-    })
-  }
-})
-
+// Add a listener for capturing an image once the user completes area selection
 chrome.runtime.onMessage.addListener((req, sender, res) => {
   if (req.message === 'capture') {
-    console.log("capture")
+    console.log(`Capturing the selected region at: ${req.area}`)
     chrome.tabs.getSelected(null, (tab) => {
 
       chrome.tabs.captureVisibleTab(tab.windowId, {format: "png"}, (image) => {
@@ -59,13 +52,19 @@ chrome.runtime.onMessage.addListener((req, sender, res) => {
       })
     })
   }
-  else if (req.message === 'active') {
-    console.log("active")
+  return true
+})
+
+// Add a listener for toggling icon appearance and text for when selection is active
+chrome.runtime.onMessage.addListener(() => {
+  if (req.message === 'active') {
     if (req.active) {
+      console.log("Extension Activated. Screen selection in progress")
       chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Crop'})
       chrome.browserAction.setBadgeText({tabId: sender.tab.id, text: '◩'})
     }
     else {
+      console.log("Screen selection completed.")
       chrome.browserAction.setTitle({tabId: sender.tab.id, title: 'Screenshot Capture'})
       chrome.browserAction.setBadgeText({tabId: sender.tab.id, text: ''})
     }
@@ -73,8 +72,9 @@ chrome.runtime.onMessage.addListener((req, sender, res) => {
   return true
 })
 
+// Crop the image to the selected dimensions, calls done(image) on completion
 function crop (image, area, dpr, format, done) {
-  console.log("crop")
+  console.log("Cropping image to selected area.")
   var top = area.y * dpr
   var left = area.x * dpr
   var width = area.w * dpr
