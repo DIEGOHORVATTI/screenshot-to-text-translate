@@ -1,5 +1,9 @@
 
 
+function chromeInject(tab, filename, res){
+  chrome.tabs.executeScript(tab.id, {file: filename, runAt: 'document_start'}, res)
+} 
+
 function inject (tab) {
   chrome.tabs.sendMessage(tab.id, {message: 'init'}, (res) => {
     if (res) {
@@ -11,9 +15,17 @@ function inject (tab) {
     chrome.tabs.insertCSS(tab.id, {file: 'vendor/jquery.Jcrop.min.css', runAt: 'document_start'})
     chrome.tabs.insertCSS(tab.id, {file: 'css/content.css', runAt: 'document_start'})
 
-    chrome.tabs.executeScript(tab.id, {file: 'vendor/jquery.min.js', runAt: 'document_start'})
-    chrome.tabs.executeScript(tab.id, {file: 'vendor/jquery.Jcrop.min.js', runAt: 'document_start'})
-    chrome.tabs.executeScript(tab.id, {file: 'content/content.js', runAt: 'document_start'})
+    chromeInject(tab, 'vendor/jquery.min.js')
+    chromeInject(tab, 'vendor/jquery.Jcrop.min.js')
+   
+    // OCR scripts
+   // chromeInject(tab, 'content/worker.min.js', () => {
+    chromeInject(tab, 'content/tesseract.min.js', () => {
+   //     chromeInject(tab, 'content/tesseract-core.wasm.js', () => {
+          chromeInject(tab, 'content/content.js')
+   //     })
+    })
+  //  })
 
     setTimeout(() => {
       console.log("init")

@@ -46,5 +46,6 @@
   "permissions": [
     "storage",
     "activeTab"
-  ]
+  ],
+  "Content-Security-Policy": "worker-src 'self' blob:;"
 }
