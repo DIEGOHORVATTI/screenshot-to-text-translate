@@ -69,7 +69,26 @@ var process = (image) => {
   console.log(`Test: ${typeof(image)}, ${image.nodeName}`)
   console.log(image)
   // TODO process and image that's been captured
+  doOCR(image)
 }
+
+const doOCR = async (image) => {
+  console.log("doing ocr")
+  const result = Object()
+  console.log(`image ${typeof(image)}. result ${typeof(result)}`)
+
+  const { createWorker } = Tesseract;
+  const worker = createWorker();
+  
+  await worker.load();
+  await worker.loadLanguage('eng');
+  await worker.initialize('eng');
+  const { data: { text } } = await worker.recognize(image);
+  console.log(text);
+  result.innerHTML = `<p>OCR Result:</p><p>${text}</p>`;
+  await worker.terminate();
+}
+
 
 window.addEventListener('resize', ((timeout) => () => {
   clearTimeout(timeout)
