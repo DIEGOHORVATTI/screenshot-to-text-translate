@@ -5,7 +5,7 @@ var jcrop, selection
 var overlay = ((active) => (state) => {
   active = typeof state === 'boolean' ? state : state === null ? active : !active
   $('.jcrop-holder')[active ? 'show' : 'hide']()
-  chrome.runtime.sendMessage({message: 'active', active})
+  chrome.runtime.sendMessage({ message: 'active', active })
 })(false)
 
 // Creates an image to be used for the jcrop selection interaction
@@ -36,7 +36,7 @@ var init = (done) => {
         selection = null
       }, 100)
     }
-  }, function ready () {
+  }, function ready() {
     console.log("Initializing Jcrop selection logic.")
     jcrop = this
 
@@ -72,7 +72,7 @@ var capture = () => {
 
 // Run OCR {Character Recognition} on the image selection, and notify the user of the result
 const doOCR = async (image) => {
-  console.log("Running OCR on the image capture")
+  console.log("Running OCR on the image capture");
 
   const { createWorker } = Tesseract;
   const worker = createWorker();
@@ -81,9 +81,27 @@ const doOCR = async (image) => {
   await worker.initialize('eng');
   const { data: { text } } = await worker.recognize(image);
   console.log(`OCR completed, result text: ${text}`);
-  alert(text);
+
+  try {
+    const response = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ text, to: "pt" }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(response);
+        }
+      });
+    });
+
+    const translatedText = response.translatedText;
+    console.log(`Translated text: ${translatedText}`);
+  } catch (error) {
+    console.error(`Error translating text: ${error}`);
+  }
+
   await worker.terminate();
 }
+
 
 // Cancel the jcrop overlay & capture when the window is resized
 window.addEventListener('resize', ((timeout) => () => {

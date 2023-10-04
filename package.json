@@ -10,10 +10,18 @@
     "type": "git",
     "url": "https://github.com/jordansafer/screenshot-to-text.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@vitalets/google-translate-api": "^9.2.0",
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2"
+  },
   "bin": {},
   "main": "",
   "files": [],
   "scripts": {},
-  "engines": {}
+  "engines": {},
+  "devDependencies": {
+    "@types/body-parser": "^1.19.3",
+    "@types/express": "^4.17.18"
+  }
 }
